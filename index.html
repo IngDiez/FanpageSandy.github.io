@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ti ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Pantalla de bloqueo */
+        #lockScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #lockScreen.hidden {
+            display: none;
+        }
+
+        .heart-lock {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 50px;
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Base del corazón (dos mitades) */
+        .heart-lock:before,
+        .heart-lock:after {
+            content: "";
+            position: absolute;
+            width: 150px;
+            height: 240px;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 50%, #c71585 100%);
+            border-radius: 150px 150px 0 0;
+            z-index: 1;
+            box-shadow: 
+                inset -20px -20px 40px rgba(0, 0, 0, 0.2),
+                inset 20px 20px 40px rgba(255, 255, 255, 0.1);
+        }
+
+        .heart-lock:before {
+            left: 150px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart-lock:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        /* Brillo superior izquierdo (mantener el efecto de brillo) */
+        .heart-wave {
+            content: "";
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            width: 60px;
+            height: 80px;
+            background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 40%, transparent 70%);
+            border-radius: 50%;
+            transform: rotate(-20deg);
+            z-index: 2;
+        }
+
+        /* Asa del candado */
+        .lock-shackle {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 135px;
+            border: 25px solid #5c0c3f;
+            border-bottom: none;
+            border-radius: 75px 75px 0 0;
+            z-index: 0;
+            box-shadow: 
+                inset 0 5px 10px rgba(0, 0, 0, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Cerradura */
+        .keyhole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #5c2e0f;
+            border-radius: 50%;
+            z-index: 3;
+            box-shadow: 
+                inset 0 3px 8px rgba(0, 0, 0, 0.5),
+                0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .keyhole:after {
+            content: "";
+            position: absolute;
+            top: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 35px solid #5c2e0f;
+            filter: drop-shadow(inset 0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        /* Estrellas decorativas */
+        .sparkle {
+            position: absolute;
+            color: #ffe5b4;
+            font-size: 45px;
+            z-index: 3;
+            text-shadow: 0 0 15px rgba(255, 229, 180, 0.8);
+        }
+        
+        /* Posiciones aleatorias para cada estrella */
+        .sparkle:nth-child(1) { top: 15%; left: 20%; animation: float-sparkle 12s infinite linear; }
+        .sparkle:nth-child(2) { top: 75%; right: 35%; animation: float-sparkle 15s infinite linear 1s; }
+        .sparkle:nth-child(3) { top: 45%; left: 45%; animation: float-sparkle 10s infinite linear 2s; }
+        .sparkle:nth-child(4) { top: 25%; right: 15%; animation: float-sparkle 14s infinite linear 0.5s; }
+        .sparkle:nth-child(5) { top: 85%; left: 40%; animation: float-sparkle 13s infinite linear 1.5s; }
+        .sparkle:nth-child(6) { top: 35%; right: 25%; animation: float-sparkle 11s infinite linear 2.5s; }
+        .sparkle:nth-child(7) { top: 65%; left: 30%; animation: float-sparkle 16s infinite linear 0.8s; }
+        .sparkle:nth-child(8) { top: 15%; right: 45%; animation: float-sparkle 9s infinite linear 1.7s; }
+        .sparkle:nth-child(9) { top: 55%; left: 15%; animation: float-sparkle 17s infinite linear 2.2s; }
+        .sparkle:nth-child(10) { top: 85%; right: 20%; animation: float-sparkle 13s infinite linear 0.3s; }
+        .sparkle:nth-child(11) { top: 25%; left: 35%; animation: float-sparkle 14s infinite linear 1.9s; }
+        .sparkle:nth-child(12) { top: 45%; right: 30%; animation: float-sparkle 12s infinite linear 2.7s; }
+        .sparkle:nth-child(13) { top: 75%; left: 25%; animation: float-sparkle 15s infinite linear 0.6s; }
+        .sparkle:nth-child(14) { top: 35%; right: 40%; animation: float-sparkle 11s infinite linear 1.4s; }
+        .sparkle:nth-child(15) { top: 65%; left: 45%; animation: float-sparkle 16s infinite linear 2.3s; }
+
+        @keyframes float-sparkle {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            25% {
+                transform: translate(calc(30vw - 50px), calc(-20vh + 50px)) rotate(90deg) scale(1.2);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(calc(-20vw + 30px), calc(30vh - 30px)) rotate(180deg) scale(0.9);
+            }
+            75% {
+                transform: translate(calc(25vw - 40px), calc(-15vh + 40px)) rotate(270deg) scale(1.1);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        /* Mantener el efecto de brillo */
+        @keyframes twinkle {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
+            50% { 
+                opacity: 0.5; 
+                transform: scale(1.2); 
+            }
+        }
+
+        /* Ondas internas decorativas */
+        .heart-wave {
+            position: absolute;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 120px;
+            background: radial-gradient(ellipse at center, rgba(255, 192, 203, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.05); }
+        }
+
+        /*Contenedor de la contraseña*/
+        .password-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 192, 203, 0.95));
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255, 105, 180, 0.3);
+            backdrop-filter: blur(10px);
+            animation: container-glow 2s infinite alternate;
+        }
+
+        .password-container h2 {
+            color: #ff1493;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        #passwordInput {
+            width: 280px;
+            padding: 20px;
+            font-size: 24px;
+            text-align: center;
+            border: 3px solid #ff69b4;
+            border-radius: 15px;
+            letter-spacing: 12px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #passwordInput:focus {
+            outline: none;
+            border-color: #ff1493;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
+            transform: scale(1.02);
+        }
+
+        #unlockBtn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 15px 45px;
+            font-size: 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #unlockBtn:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+            transform: scale(0);
+            transition: transform 0.5s;
+        }
+
+        #unlockBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+        }
+
+        #unlockBtn:hover:before {
+            transform: scale(1);
+        }
+
+        .error-msg {
+            color: #ff0033;
+            margin-top: 15px;
+            font-size: 16px;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+        }
+
+        @keyframes container-glow {
+            from {
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            }
+            to {
+                box-shadow: 0 15px 35px rgba(255, 20, 147, 0.3);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Contenido principal */
+        #mainContent {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ff69b4, #c71585, #4B0082, #800080);
+            background-size: 400% 400%;
+            padding: 50px 20px;
+            position: relative;
+            overflow: hidden;
+            animation: gradientMove 15s ease infinite;
+            border: 20px solid transparent;
+            border-image: linear-gradient(45deg, #ff69b4, #c71585, #4B0082, #800080) 1;
+            position: relative;
+        }
+
+        /* Efecto de partículas brillantes */
+        #mainContent::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: sparkleBackground 20s linear infinite;
+        }
+
+        /* Efecto de ondas */
+        #mainContent::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 20px;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.1) 50%, transparent 55%);
+            background-size: 200% 200%;
+            animation: waveEffect 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes sparkleBackground {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-30px);
+            }
+        }
+
+        @keyframes waveEffect {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        #mainContent > *:first-child::after {
+            content: "❤️";
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            z-index: 10;
+            filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.5));
+            animation: cornerHeartBeat 2s infinite ease-in-out;
+        }
+        #mainContent > *:first-child::before{
+            bottom: 20px;
+            left: 20px;
+        }
+        #mainContent > *:first-child::after{
+            top: 20px;
+            right: 20px;
+        }
+
+        /* Añadir decoración lateral */
+        .side-decoration {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .side-decoration.left {
+            left: 20px;
+        }
+
+        .side-decoration.right {
+            right: 20px;
+        }
+
+        .side-decoration span {
+            font-size: 30px;
+            animation: floatSide 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.4));
+        }
+
+        @keyframes cornerHeartBeat {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        @keyframes floatSide {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+        }
+
+        #mainContent.active {
+            display: block;
+        }
+
+        /* Corazones flotantes */
+        .floating-heart {
+            position: absolute;
+            font-size: 50px;
+            animation: float 6s infinite ease-in-out;
+            filter: drop-shadow(0 0 20px rgba(102, 51, 153, 0.8));
+        }
+
+        .floating-heart::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(102, 51, 153, 0.6) 0%, rgba(102, 51, 153, 0.3) 50%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse-aura 2s infinite;
+        }
+
+        @keyframes pulse-aura {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* Sobre con carta */
+        .envelope-container {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .envelope {
+            width: 300px;
+            height: 210px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            margin: 0 auto;
+            position: relative;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            perspective: 1000px;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .envelope:after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            width: calc(100% - 20px);
+            height: calc(100% - 30px);
+            background: linear-gradient(45deg, #fff 0%, #f8f8f8 100%);
+            border-radius: 15px;
+            opacity: 0;
+            transition: none;
+            z-index: 1;
+        }
+
+        .envelope:hover:after {
+            opacity: 1;
+        }
+
+        .envelope:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(255,20,147,0.4);
+        }
+
+        .envelope:before {
+            content: "❤️";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            z-index: 2;
+            transition: all 0.4s ease;
+        }
+
+        .envelope:hover:before {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0.8;
+        }
+
+        .envelope-flap {
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 105px solid #ff1493;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: top;
+            transition: transform 0.4s ease-out;
+            z-index: 3;
+        }
+
+        .envelope:hover .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        /* Modal del sobre */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 60px;
+            border-radius: 25px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h2 {
+            color: #ff69b4;
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+
+        .modal-content p {
+            color: #764ba2;
+            font-size: 24px;
+            line-height: 1.6;
+        }
+
+        .close-modal {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        /* Galería de fotos */
+        .gallery {
+            max-width: 1200px;
+            margin: 80px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .photo-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(255, 0, 0, 0.4);
+            border: 2px solid rgba(255, 0, 0, 0.6);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #ffd1dc, #ffb6c1);
+            border-radius: 15px;
+            background-size: cover;
+            background-position: center;
+            font-size: 60px;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+
+        .photo-card:hover .photo-placeholder {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .photo-card:hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(0, 47, 255, 0.2),
+                rgba(0, 47, 255, 0.1)
+            );
+            border-radius: 20px;
+            z-index: 1;
+            animation: glowPulse 1.5s infinite alternate;
+        }
+
+        .photo-card h3 {
+            color: #764ba2;
+            font-size: 18px;
+        }
+
+        .photo-card:hover h3 {
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        @keyframes glowPulse {
+            from {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.3) inset;
+            }
+            to {
+                box-shadow: 0 0 40px rgba(255, 0, 0, 0.6) inset;
+            }
+        }
+
+        /* Vista de foto */
+        .photo-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ff69b4 100%);
+            z-index: 3000;
+            padding: 50px 20px;
+            overflow-y: auto;
+        }
+
+        .photo-view.active {
+            display: block;
+        }
+
+        .photo-view-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            text-align: center;
+        }
+
+        .photo-view-hearts {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.3;
+            animation: float 4s infinite ease-in-out;
+        }
+
+        .photo-display {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 5px 20px rgba(0,0,0,0.1);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .photo-text {
+            color: #764ba2;
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #dc143c, #ff0000);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            transition: transform 0.3s;
+            margin: 0 auto;
+        }
+
+        .back-btn:before {
+            content: "❤️";
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Sección del carrusel */
+        .carousel-section {
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .carousel-title {
+            font-size: 36px;
+            color: white;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4B0082, #800080, #FF1493, #FF69B4);
+            background-size: 300% 300%;
+            padding: 20px 40px;
+            border-radius: 15px;
+            display: inline-block;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: gradientBG 3s ease infinite, glowingTitle 2s ease-in-out infinite;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes gradientBG {
+            0% { 
+                background-position: 0% 50%; 
+            }
+            50% { 
+                background-position: 100% 50%; 
+            }
+            100% { 
+                background-position: 0% 50%; 
+            }
+        }
+
+        @keyframes glowingTitle {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3),
+                    0 0 20px rgba(255, 105, 180, 0.5);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 15px 40px rgba(0,0,0,0.4),
+                    0 0 40px rgba(255, 105, 180, 0.8);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3),
+                    0 0 20px rgba(255, 105, 180, 0.5);
+            }
+        }
+
+        .carousel-title::before,
+        .carousel-title::after {
+            content: "❤️";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 32px;
+            animation: heartBeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: translateY(-50%) scale(1);
+            }
+            50% {
+                transform: translateY(-50%) scale(1.2);
+            }
+        }
+
+        .carousel-title::before {
+            left: -40px;
+        }
+
+        .carousel-title::after {
+            right: -40px;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+            display: flex;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffc0cb, #ff69b4);
+            cursor: pointer;
+        }
+
+        .carousel-slide:hover {
+            transform: scale(1.02);
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: linear-gradient(135deg, #ffd1dc, #ffb6c1);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+
+        .carousel-slide:hover .carousel-photo {
+            transform: scale(1.05);
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .carousel-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de bloqueo -->
+    <div id="lockScreen">
+        <div class="heart-lock">
+            <div class="lock-shackle"></div>
+            <div class="heart-wave"></div>
+            <div class="keyhole"></div>
+            <div class="sparkle">✦</div>
+            <div class="sparkle">✦</div>
+            <div class="sparkle">✦</div>
+            <div class="sparkle">+</div>
+            <div class="sparkle">✦</div>
+        </div>
+        <div class="password-container">
+            <h2>Ingresa el código</h2>
+            <input type="password" id="passwordInput" maxlength="6" placeholder="******">
+            <br>
+            <button id="unlockBtn">Desbloquear</button>
+            <p class="error-msg" id="errorMsg">Contraseña incorrecta ❌</p>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div id="mainContent">
+        <!-- Decoraciones laterales -->
+        <div class="floating-heart" style="left: 10%; top: 20%;">💕</div>
+        <div class="floating-heart" style="left: 80%; top: 30%; animation-delay: 1s;">❤️</div>
+        <div class="floating-heart" style="left: 20%; top: 70%; animation-delay: 2s;">💖</div>
+        <div class="floating-heart" style="left: 70%; top: 60%; animation-delay: 1.5s;">💗</div>
+        <div class="floating-heart" style="left: 50%; top: 10%; animation-delay: 0.5s;">💓</div>
+
+        <!-- Sección del carrusel -->
+        <div class="carousel-section">
+            <h1 class="carousel-title">Página dedicada a mi gordita hermosa</h1>
+            <div class="carousel-container">
+                <div class="carousel-slide active" data-photo-id=1>
+                    <div class="carousel-photo" style="background-image: url('images/foto1.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=2>
+                    <div class="carousel-photo" style="background-image: url('images/foto2.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=3>
+                    <div class="carousel-photo" style="background-image: url('images/foto3.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=4>
+                    <div class="carousel-photo" style="background-image: url('images/foto4.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=5>
+                    <div class="carousel-photo" style="background-image: url('images/foto5.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=6>
+                    <div class="carousel-photo" style="background-image: url('images/foto6.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=7>
+                    <div class="carousel-photo" style="background-image: url('images/foto7.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=8>
+                    <div class="carousel-photo" style="background-image: url('images/foto8.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=9>
+                    <div class="carousel-photo" style="background-image: url('images/foto9.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=10>
+                    <div class="carousel-photo" style="background-image: url('images/foto10.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=11>
+                    <div class="carousel-photo" style="background-image: url('images/foto11.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=12>
+                    <div class="carousel-photo" style="background-image: url('images/foto12.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=13>
+                    <div class="carousel-photo" style="background-image: url('images/foto13.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=14>
+                    <div class="carousel-photo" style="background-image: url('images/foto14.jpg');"></div>
+                </div>
+                <div class="carousel-slide" data-photo-id=15>
+                    <div class="carousel-photo" style="background-image: url('images/foto15.jpg');"></div>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-btn" id="prevBtn">❮</button>
+                    <button class="carousel-btn" id="nextBtn">❯</button>
+                </div>
+            </div>
+            <div class="carousel-indicators" id="indicators"></div>
+        </div>
+
+        <!-- Sobre con mensaje -->
+        <div class="envelope-container">
+            <div class="envelope" id="envelope">
+                <div class="envelope-flap"></div>
+            </div>
+        </div>
+
+        <!-- Galería de fotos -->
+        <div class="gallery" id="gallery">
+            <!-- Las 15 tarjetas de fotos se generarán con JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal del sobre -->
+    <div class="modal" id="envelopeModal">
+        <div class="modal-content">
+            <h2>💕 Para Mi Niña Linda 💕</h2>
+            <p>Dedicada para la mujer que más admiro y amo en este mundo, el amor de mi alma y compañera de vida para compartirte de una pequeña forma lo mucho que te amo.</p>
+            <button class="close-modal" id="closeEnvelope">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Vista de foto individual -->
+    <div class="photo-view" id="photoView">
+        <div class="photo-view-content">
+            <div class="photo-view-hearts" style="top: 20px; left: 20px;">💜</div>
+            <div class="photo-view-hearts" style="top: 40px; right: 30px; animation-delay: 1s;">💜</div>
+            <div class="photo-view-hearts" style="bottom: 30px; left: 40px; animation-delay: 2s;">💜</div>
+            <div class="photo-view-hearts" style="bottom: 50px; right: 20px; animation-delay: 0.5s;">💜</div>
+            
+            <div class="photo-display" id="photoDisplay">📷</div>
+            <p class="photo-text" id="photoText">Aquí puedes añadir el texto personalizado para cada foto. Describe el momento especial, los sentimientos y los recuerdos que quieras compartir.</p>
+            <button class="back-btn" id="backBtn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Regresar</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de las fotos (puedes personalizar cada una)
+        const photosData = [
+            { id: 1, 
+                title: "Nuestro inicio", 
+                image: "images/foto1.jpg", 
+                text: "Como no olvidar aquellos días en secundaria, donde me empezaste a gustar y me diste el inicio de una conexión, aunque en ese momento no me había dado cuenta..." 
+            },
+            { id: 2, 
+                title: "Tus lindos ojos", 
+                image: "images/foto2.jpg", 
+                text: "Esos ojitos tan lindos que tu tienes de los cuales me enamore desde el primer día, me hacen comprender todo lo que llegas a sentir con el simple hecho de solo mirarlos..." 
+            },
+            { id: 3, 
+                title: "Tu linda carita", 
+                image: "images/foto3.jpg", 
+                text: "Esa carita de la cual estoy perdidamente enamorado me hace sentir extraño, me llena de tanta felicidad con solo mirarla, me hace sentir un gran deseo verla todos los días de mi vida..." 
+            },
+            { id: 4, 
+                title: "Tu hermosa sonrisa", 
+                image: "images/foto4.jpg", 
+                text: "Esa sonrisa que tienes no sabes como me llena de felicidad, me encanta verte sonreir que me hace desear verte siempre feliz y con esa sonrisa tan hermosa..." 
+            },
+            { id: 5, 
+                title: "Tu carisma", 
+                image: "images/foto5.jpg", 
+                text: "Tu forma de ser conmigo como me encanta, tus locuras de amor, incluso cuando estas molesta, siento todo ese amor que me deseas dar y me hace muy feliz sentir que ese amor es mutuo y sin dudarlo siento que es puro y parte de nuestra conexión..." 
+            },
+            { id: 6, 
+                title: "Tu descanso", 
+                image: "images/foto6.jpg", 
+                text: "Como me encanta verte y escucharte dormir, es algo que me fascina, me hace sentir mucha ternura, me genera una paz tan bonita y me da ese deseo inmenso de querer cuidarte y protegerte siempre ..." 
+            },
+            { id: 7, 
+                title: "Simplemente tú", 
+                image: "images/foto7.jpg", 
+                text: "Con tan solo el hecho de que existas me llenas de tanta felicidad, me llena de felicidad haber encontrado a quien siempre soñé y que seas tu esa persona más que indicada para mi, me da una sensación tan fuerte de amarte de manera incondicional... " 
+            },
+            { id: 8, 
+                title: "Primera cita", 
+                image: "images/foto8.jpg", 
+                text: "Como olvidar nuestra primera cita, lleno de miedo y nervios por verte, pero con una gran emoción de pasar un rato contigo, buscando un detalle para ti aunque no fue mucho me senti feliz al ver que te habia gustado y tambien llegue a sentir ese deseo de querer hacerte sentir feliz aunque sea con mucho o poco siempre buscar algo que te haga sentir esa emoción..." 
+            },
+            { id: 9, 
+                title: "Primeros meses", 
+                image: "images/foto9.jpg", 
+                text: "Fueron meses lindos con salidas al bosque y al parque donde me gustaba mucho verte y pasar ratos contigo, aún sentía esos nervios cada que ibamos a vernos, fue una etapa linda pero tambien aún no comprendia un significado que es muy valioso..." 
+            },
+            { id: 10, 
+                title: "Nuestras locuras", 
+                image: "images/foto10.jpg", 
+                text: "Esos momentos de más confianza donde ya comenzabamos a hacer y decir locuras, en donde ya no existian esos nervios y comenzabamos a ser más nosotros mismos, en ese punto ya comenzaba a entender de una mejor manera ese gran significado..." 
+            },
+            { id: 11, 
+                title: "Tu compañia", 
+                image: "images/foto11.jpg", 
+                text: "Me encanta que seamos esos compañeros de vida, que ambos estemos el uno para el otro, que podamos compartir lindos momentos juntos y con nuestras familias, es muy lindo que estemos siempre en esos momentos tan importantes y nada mejor que cuando estamos los dos juntitos..." 
+            },
+            { id: 12, 
+                title: "Siempre", 
+                image: "images/foto12.jpg", 
+                text: "Este significado llega a ser importante entre nosotros, abarca un todo, es más que una palabra, es la acción que cumplimos sin importar las situaciones, se podría decir que es un compromiso que tenemos ambos..." 
+            },
+            { id: 13, 
+                title: "Juntos", 
+                image: "images/foto13.jpg", 
+                text: "Le podría otorgar un solo significado como que seamos tu y yo, pero siento que va más allá de eso, que forma una unión entre nosotros que es dificil de quebrar, que va de la mano con un siempre, porque esto a sido algo constante que hemos formado y fortalecido con el paso del tiempo..." 
+            },
+            { id: 14, 
+                title: "En todos lados", 
+                image: "images/foto14.jpg", 
+                text: "Sin importar el lugar ni la distancia, este significado que le doy cubre con una parte el significado tan valioso de amar, es el querer protegernos y cuidarnos, el desear siempre estar juntos aún con la ausencia de nuestra presencia sentirnos cerca el uno de el otro por más lejos que podamos estar..." 
+            },
+            { id: 15, 
+                title: "Y momentos", 
+                image: "images/foto15.jpg", 
+                text: "Momentos o situaciones tanto buenas o malas ambos luchamos por afrontarlas de la mejor manera, esto lo comprendi despues de tropezar y querer con muchas más ganas seguir nuestra historia, aquí complemento ese significado de amar que no comprendía, las cosas se ven diferentes al perder tanto algo, como a alguien, al quebrar sentimientos y promesas te hacer relfexionar el porque de las cosas, puedes ver y dar cosas por hecho pero no siempre son así, ya que todas las cosas tienen un significado tan valioso hasta que te das cuenta y bien son esos momentos los que te hacen ser mejor, los que demuestran si de verdad dos personas se aman y contigo me doy más que cuenta de que tengo absolutamente todo y que ese significado de Siempre Juntos ya no se puede quebrar." 
+            }
+        ];
+
+        // Sistema de contraseña
+        const lockScreen = document.getElementById('lockScreen');
+        const mainContent = document.getElementById('mainContent');
+        const passwordInput = document.getElementById('passwordInput');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const errorMsg = document.getElementById('errorMsg');
+
+        unlockBtn.addEventListener('click', checkPassword);
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        function checkPassword() {
+            if (passwordInput.value === '151024') {
+                lockScreen.classList.add('hidden');
+                mainContent.classList.add('active');
+            } else {
+                errorMsg.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.style.borderColor = 'red';
+                setTimeout(() => {
+                    errorMsg.style.display = 'none';
+                    passwordInput.style.borderColor = '#ff69b4';
+                }, 2000);
+            }
+        }
+
+        // Modal del sobre
+        const envelope = document.getElementById('envelope');
+        const envelopeModal = document.getElementById('envelopeModal');
+        const closeEnvelope = document.getElementById('closeEnvelope');
+
+        envelope.addEventListener('click', () => {
+            envelopeModal.classList.add('active');
+        });
+
+        closeEnvelope.addEventListener('click', () => {
+            envelopeModal.classList.remove('active');
+        });
+
+        // Generar galería de fotos
+        const gallery = document.getElementById('gallery');
+        photosData.forEach(photo => {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            card.id = `photo-${photo.id}`;
+            card.innerHTML = `
+                <div class="photo-placeholder" style="background-image: url('${photo.image}'); background-size: cover; background-position: center;"></div>
+                <h3>${photo.title}</h3>
+            `;
+            card.addEventListener('click', () => openPhoto(photo));
+            gallery.appendChild(card);
+        });
+
+        // Vista de foto
+        const photoView = document.getElementById('photoView');
+        const photoDisplay = document.getElementById('photoDisplay');
+        const photoText = document.getElementById('photoText');
+        const backBtn = document.getElementById('backBtn');
+
+        function openPhoto(photo) {
+            const photoDisplay = document.getElementById('photoDisplay');
+            photoDisplay.style.backgroundImage = `url('${photo.image}')`;
+            photoDisplay.style.backgroundSize = 'contain';
+            photoDisplay.style.backgroundPosition = 'center';
+            photoDisplay.style.backgroundRepeat = 'no-repeat';
+            photoDisplay.textContent = '';
+            photoText.textContent = photo.text;
+            photoView.classList.add('active');
+        }
+
+        backBtn.addEventListener('click', () => {
+            photoView.classList.remove('active');
+        });
+
+        // Carrusel de fotos  
+        const slides = document.querySelectorAll('.carousel-slide');
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        const indicatorsContainer = document.getElementById('indicators');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let autoSlideInterval;
+        slides.forEach((slide, index) => {
+            if (index < photosData.length) {
+                const photo = photosData[index];
+                slide.setAttribute('data-photo-id', photo.id);
+                slide.innerHTML = `
+                    <div class="carousel-photo" style="
+                        background-image: url('${photo.image}');
+                        background-size: contain;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        width: 100%;
+                        height: 100%;
+                    "></div>
+                `;
+            }
+        });
+
+        // Crear indicadores
+        for (let i = 0; i < totalSlides; i++) {
+            const indicator = document.createElement('div');
+            indicator.className = 'indicator';
+            if (i === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => goToSlide(i));
+            indicatorsContainer.appendChild(indicator);
+        }
+
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(ind => ind.classList.remove('active'));
+            
+            currentSlide = (n + totalSlides) % totalSlides;
+            
+            slides[currentSlide].classList.add('active');
+            indicators[currentSlide].classList.add('active');
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function goToSlide(n) {
+            showSlide(n);
+        }
+
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        // Auto-avance del carrusel cada 4 segundos
+        setInterval(nextSlide, 4000);
+
+        // Click en slide del carrusel para ir a la foto en la galería
+        slides.forEach((slide) => {
+            slide.addEventListener('click', () => {
+                const photoId = slide.getAttribute('data-photo-id');
+                const photo = photosData.find(p => p.id == parseInt(photoId));
+                if (photo) { 
+                    // Encontrar la tarjeta de foto correspondiente en la galería
+                    const targetCard = document.getElementById(`photo-${photo.id}`);
+                    if (targetCard) {
+                        // Scroll suave hacia la foto
+                        targetCard.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                        // Efecto visual de resaltado
+                        targetCard.style.transform = 'scale(1.1)';
+                        targetCard.style.boxShadow = '0 0 30px rgba(255, 105, 180, 0.8)';
+                        // Remover el efecto después de 1.5 segundos
+                        setTimeout(() => {
+                            targetCard.style.transform = '';
+                            targetCard.style.boxShadow = '';
+                        }, 1500);
+                    }                  
+                }
+            });
+        });
+    </script>
+</body>
+</html>
